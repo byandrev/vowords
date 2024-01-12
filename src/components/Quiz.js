@@ -1,38 +1,46 @@
-"use client";
+"use client"
 
-import { Button, RadioGroup, cn } from "@nextui-org/react";
+import { useState } from "react"
 
-import Option from "@/components/Option";
+import { questions as initialQuestions } from "@/data/questions"
+
+import Question from "./Question"
+import ProgressBar from "./ProgressBar";
 
 function Quiz() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questions, setQuestions] = useState(initialQuestions)
+  const [responses, setResponses] = useState([])
+
+  const handleResponse = (id, response) => {
+    setResponses(prev => {
+      return [...prev, { id, response }]
+    })
+
+    if (currentQuestion < questions.length) {
+      setCurrentQuestion(prev => prev+1)
+    }
+  }
+
   return (
-    <article className="max-w-xl mx-auto">
-      <h3 className="text-center text-xl mb-2">
-        A place full of stories, on shelves stand, Silent, but speaks volumes
-        with its pages, what is it?
-      </h3>
+    <div className="w-full">
+      <ProgressBar current={currentQuestion} limit={questions.length} />
 
-      <p className="text-center text-md mb-10 text-gray-400">
-        Un lugar lleno de historias, en estantes se alzan, Silencioso, pero
-        habla mucho con sus páginas, ¿qué es?
-      </p>
+      {currentQuestion < questions.length
+        ?
+       <Question
+         id={questions[currentQuestion].id}
+         key={questions[currentQuestion].id}
+         title={questions[currentQuestion].title}
+         options={questions[currentQuestion].options}
+         handleResponse={handleResponse}
+       />
+        : <span>End</span>
+      }
 
-      <RadioGroup
-        classNames={{
-          base: cn("*:gap-y-6 *:gap-x-2 *:grid *:grid-cols-2"),
-        }}
-      >
-        <Option value="pencil">Pencil</Option>
-        <Option value="library">Library</Option>
-        <Option value="desk">Desk</Option>
-        <Option value="classroom">Classroom</Option>
-      </RadioGroup>
 
-      <footer className="mt-8 flex justify-end">
-        <Button color="primary">Siguiente</Button>
-      </footer>
-    </article>
-  );
+    </div>
+  )
 }
 
-export default Quiz;
+export default Quiz
